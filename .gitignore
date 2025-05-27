@@ -1,6 +1,8 @@
 .env
 .env.*
 
+__pycache__/
+
 # data
 data/
 *.csv
