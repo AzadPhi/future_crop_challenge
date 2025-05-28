@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, RobustScaler
+from sklearn.preprocessing import StandardScaler, RobustScaler, OneHotEncoder
 
 def get_annual_data(table: dict):
     """
@@ -21,28 +21,53 @@ def get_annual_data(table: dict):
     annual_rsds = table['rsds'].iloc[:,5:].mean(axis=1)
 
     # concats all the annual datas in a dataframe
-    annual_data = pd.concat([table['pr'][['year', 'lon', 'lat']], # keep the identifications values ?
-                             annual_pr,
-                             annual_tas,
-                             annual_tasmin,
-                             annual_tasmax,
-                             annual_rsds,
-                             table['soil_co2'][['texture_class', 'co2', 'nitrogen']],
-                             table['target']],
-                            axis=1)
+    if 'target' in table:
+        annual_data = pd.concat([table['pr'][['year', 'lon', 'lat', 'crop']], # keep the identifications values ?
+                                annual_pr,
+                                annual_tas,
+                                annual_tasmin,
+                                annual_tasmax,
+                                annual_rsds,
+                                table['soil_co2'][['texture_class', 'co2', 'nitrogen']],
+                                table['target']],
+                                axis=1)
 
-    annual_data.columns = ['year',
-                           'lon',
-                           'lat',
-                           'total_precipitation',
-                           'mean_tas',
-                           'mean_tasmin',
-                           'mean_tasmax',
-                           'mean_rsds',
-                           'texture_class',
-                           'co2',
-                           'nitrogen',
-                           'yield']
+        annual_data.columns = ['year',
+                            'lon',
+                            'lat',
+                            'crop',
+                            'total_precipitation',
+                            'mean_tas',
+                            'mean_tasmin',
+                            'mean_tasmax',
+                            'mean_rsds',
+                            'texture_class',
+                            'co2',
+                            'nitrogen',
+                            'yield']
+    else:
+        annual_data = pd.concat([table['pr'][['year', 'lon', 'lat', 'crop']], # keep the identifications values ?
+                                annual_pr,
+                                annual_tas,
+                                annual_tasmin,
+                                annual_tasmax,
+                                annual_rsds,
+                                table['soil_co2'][['texture_class', 'co2', 'nitrogen']]],
+                                axis=1)
+
+        annual_data.columns = ['year',
+                            'lon',
+                            'lat',
+                            'crop',
+                            'total_precipitation',
+                            'mean_tas',
+                            'mean_tasmin',
+                            'mean_tasmax',
+                            'mean_rsds',
+                            'texture_class',
+                            'co2',
+                            'nitrogen']
+
 
     return annual_data
 
@@ -52,7 +77,7 @@ def val_train_split_the_data(table, test_size=0.3):
     this functions splits the data in X_train, X_val, y_train, y_val
     """
 
-    features = ['total_precipitation', 'mean_tas', 'mean_tasmin',
+    features = ['crop', 'total_precipitation', 'mean_tas', 'mean_tasmin',
             'mean_tasmax', 'mean_rsds', 'texture_class', 'co2', 'nitrogen']
 
     X = table[features]
@@ -61,3 +86,13 @@ def val_train_split_the_data(table, test_size=0.3):
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=test_size)
 
     return X_train, X_val, y_train, y_val
+
+def crop_encoding(X):
+    """
+    one hot encode the column 'crop'
+    """
+    ohe = OneHotEncoder(drop='if_binary',
+                        sparse_output=False,
+                        handle_unknown='ignore')
+    X[['crop']] = ohe.fit_transform(X[['crop']])
+    return X
