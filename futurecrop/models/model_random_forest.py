@@ -20,7 +20,7 @@ def init_random_forest_model(n_estimators=200,
     return RandomForestRegressor(n_estimators=n_estimators,
                                  max_depth=max_depth)
 
-
+RandomForestRegressor()
 def train_random_forest_model(model, X, y):
     model.fit(X, y)
     print("🏋️​🏋️​ Model trained 🏋️​🏋️​")
@@ -110,10 +110,6 @@ if __name__ == '__main__':
     elif MODE == 'test':
         # load the trained model
         model = load_model(path=PATH_TO_MODEL)
-
-        # features = ['crop', 'total_precipitation', 'mean_tas', 'mean_tasmin',
-        #     'mean_tasmax', 'mean_rsds', 'texture_class', 'co2', 'nitrogen']
-        # annual_maize_and_wheat = annual_maize_and_wheat[features]
 
         # make predictions and store them as .csv
         predictions = rf_prediction(model=model,
