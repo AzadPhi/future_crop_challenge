@@ -1,6 +1,7 @@
 .env
 .env.*
 .venv/
+.envrc
 
 __pycache__/
 
@@ -8,6 +9,7 @@ __pycache__/
 data/
 *.csv
 *.parquet
+*.pkl
 
 # notebook
 *.ipynb

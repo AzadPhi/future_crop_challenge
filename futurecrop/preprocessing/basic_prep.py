@@ -29,8 +29,11 @@ def load_data(crop: str, mode: str='train', path_to_data_directory=None):
         data['target'] = pd.read_parquet(
             os.path.join(path_to_data_directory, f"{mode}_solutions_{crop}.parquet")
             )
-
+    print(f"The table {crop}_{mode} has been loaded as a dict !")
+    print(f"It contains the following dataframes: {data.keys()}")
     return data
+
+
 
 
 def handle_column_year(data: dict):
@@ -46,6 +49,13 @@ def handle_column_year(data: dict):
             data[key] = data[key].drop(columns='year')
             data[key] = data[key].rename(columns={'real_year': 'year'})
 
+    print("The column year has been processed!")
     return data
 
-
+def crop_encoding(X):
+    """
+    simple encoding for the crop column : {'maize': 1, 'wheat': 0}
+    """
+    X['crop'] = X['crop'].map({'maize': 1, 'wheat': 0})
+    print("The column 'crop' has been encoded!")
+    return X
